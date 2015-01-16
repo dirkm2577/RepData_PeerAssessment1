@@ -18,15 +18,26 @@ activity$date <- strptime(activity$date, "%Y-%m-%d")
 ```{r}
 activity2 <- data.frame("Date" = activity$date, "Steps" = activity$steps)
 activity3 <- aggregate(Steps ~ Date, data = activity2, FUN = "sum")
+
+# Plotting the histogram of total number of steps per day
 with(activity3, plot(activity3$Date, activity3$Steps, main = "Total Steps per Day", xlab = "Days", ylab = "Steps", type = "h")) # "h" for type 'histogram'
-with(subset(activity3), lines(mean(activity3$Steps), y = NULL, type = "l"))
+
 mean(activity3$Steps) # result is 10766.19
+median(activity3$Steps) # result is 10765
 ```
 
+The mean total number of steps taken per day is 10766.19.
+
+The median for the total number of steps taken per day is 10765.
 
 ## What is the average daily activity pattern?
 
+# Time Series Plot for average steps per interval, averaged across all days
 
+```{r}
+activity4 <- aggregate(steps ~ interval, data = activity, FUN = "mean")
+with(activity4, plot(activity4$interval, activity4$steps, main = "Time Series Plot", xlab = "5-minute Intervals", ylab = "Steps", type = "l"))
+```
 
 ## Imputing missing values
 
