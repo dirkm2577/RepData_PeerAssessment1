@@ -51,6 +51,40 @@ activity5[activity5$steps == 10927,]
 
 ## Imputing missing values
 
+## 5. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
+```{r}
+sum(is.na(activity$steps) == TRUE)
+```
+
+*The total number of rows with NAs is 2304.*
+
+## 6. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+*To make the calculation for the complete dataset more accurate, I will replace the NAs with the corresponding mean for the particular interval.*
+
+## 7. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+```{r}
+library(dplyr)
+activity_imp <- merge(activity, activity4, by = "interval")
+subset(activity_imp, interval >= 0, select = interval:date, drop = FALSE, steps.x[is.na(steps.x)] <- steps.y[is.na(steps.x)])
+imputed_df <- select(activity_imp, interval:date)
+```
+
+## 8. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+```{r}
+new_imp <- data.frame("Date" = imputed_df$date, "Steps" = imputed_df$steps)
+new_steps_day <- aggregate(Steps ~ Date, data = new_imp, FUN = "sum")
+with(new_steps_day, plot(new_steps_day$Date, new_steps_day$Steps, main = "Total Steps per Day", xlab = "Days", ylab = "Steps", type = "h"))
+```
+
+```{r}
+mean(new_steps_day$Steps)
+median(new_steps_day$Steps)
+```
+
+*The mean for the total steps per day has not changed after imputing the NA values, just the median has changed and is now equal to the mean.*
 
 ## Are there differences in activity patterns between weekdays and weekends?
