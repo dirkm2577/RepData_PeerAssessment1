@@ -36,6 +36,7 @@ median(activity3$Steps) # result is 10765
 
 ```{r}
 activity4 <- aggregate(steps ~ interval, data = activity, FUN = "mean")
+# Plotting the Time Series Plot
 with(activity4, plot(activity4$interval, activity4$steps, main = "Time Series Plot", xlab = "5-minute Intervals", ylab = "Steps", type = "l"))
 ```
 
