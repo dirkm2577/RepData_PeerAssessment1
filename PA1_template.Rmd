@@ -69,14 +69,16 @@ sum(is.na(activity$steps) == TRUE)
 ```{r}
 library(dplyr)
 activity_imp <- merge(activity, activity4, by = "interval")
-subset(activity_imp, interval >= 0, select = interval:date, drop = FALSE, steps.x[is.na(steps.x)] <- steps.y[is.na(steps.x)])
-imputed_df <- select(activity_imp, interval:date)
+activity_imp$steps <- activity_imp$steps.x
+my_na <- is.na(activity_imp$steps.x)
+activity_imp$steps[my_na] <- activity_imp$steps.y[my_na]
+activity_imp <- select(activity_imp, date, steps, interval, -c(steps.x, steps.y))
 ```
 
 ## 8. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ```{r}
-new_imp <- data.frame("Date" = imputed_df$date, "Steps" = imputed_df$steps)
+new_imp <- data.frame("Date" = activity_imp$date, "Steps" = activity_imp$steps)
 new_steps_day <- aggregate(Steps ~ Date, data = new_imp, FUN = "sum")
 with(new_steps_day, plot(new_steps_day$Date, new_steps_day$Steps, main = "Total Steps per Day", xlab = "Days", ylab = "Steps", type = "h"))
 ```
