@@ -9,7 +9,7 @@ activity$date <- strptime(activity$date, "%Y-%m-%d")
 ```
 
 
-## What is mean total number of steps taken per day?
+# What is mean total number of steps taken per day?
 
 
 ```r
@@ -42,7 +42,7 @@ median(activity3$Steps) # result is 10765
 
 *The median for the total number of steps taken per day is 10765.*
 
-## What is the average daily activity pattern?
+# What is the average daily activity pattern?
 
 ### Time Series Plot for average steps per interval, averaged across all days
 
@@ -78,9 +78,9 @@ activity5[activity5$steps == 10927,]
 
 *The interval '835' contains the maximum number of steps (10927).*
 
-## Imputing missing values
+# Imputing missing values
 
-## 5. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+### 5. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
 
 ```r
@@ -93,11 +93,11 @@ sum(is.na(activity$steps) == TRUE)
 
 *The total number of rows with NAs is 2304.*
 
-## 6. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+### 6. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
 *To make the calculation for the complete dataset more accurate, I will replace the NAs with the corresponding mean for the particular interval.*
 
-## 7. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+### 7. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
 
 ```r
@@ -122,10 +122,10 @@ activity_imp <- merge(activity, activity4, by = "interval")
 activity_imp$steps <- activity_imp$steps.x
 my_na <- is.na(activity_imp$steps.x)
 activity_imp$steps[my_na] <- activity_imp$steps.y[my_na]
-activity_imp <- select(activity_imp, date, steps, interval, -c(steps.x, steps.y))
+activity_imp <- select(activity_imp, date, steps, interval)
 ```
 
-## 8. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+### 8. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 
 ```r
@@ -155,4 +155,32 @@ median(new_steps_day$Steps)
 
 *The mean for the total steps per day has not changed after imputing the NA values, just the median has changed and is now equal to the mean.*
 
-## Are there differences in activity patterns between weekdays and weekends?
+# Are there differences in activity patterns between weekdays and weekends?
+
+### 9. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+
+```r
+new_steps1 <- activity_imp %>% mutate(weekdays_1 = weekdays(activity_imp$date, abbreviate = TRUE))
+new_steps1$days <- new_steps1$weekdays_1
+new_steps1$days[new_steps1$days == "Mon"] <- "weekday"
+new_steps1$days[new_steps1$days == "Tue"] <- "weekday"
+new_steps1$days[new_steps1$days == "Wed"] <- "weekday"
+new_steps1$days[new_steps1$days == "Thu"] <- "weekday"
+new_steps1$days[new_steps1$days == "Fri"] <- "weekday"
+new_steps1$days[new_steps1$days == "Sat"] <- "weekend"
+new_steps1$days[new_steps1$days == "Sun"] <- "weekend"
+new_steps_week <- select(new_steps1, date, days, steps, interval)
+```
+
+### 10. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+
+
+```r
+library(lattice)
+new_steps2 <- aggregate(steps ~ interval + days, data = new_steps_week, FUN = "mean")
+xyplot(steps ~ interval | days, data = new_steps2, layout = c(1, 2), type = "l")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
